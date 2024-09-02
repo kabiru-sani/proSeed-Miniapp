@@ -38,7 +38,7 @@ function App() {
   const [levelIndex, setLevelIndex] = useState(6);
   const [points, setPoints] = useState(22749365);
   const [clicks, setClicks] = useState<{ id: number, x: number, y: number }[]>([]);
-  const pointsToAdd = 10;
+  const pointsToAdd = 11;
   const profitPerHour = 126420;
 
   const [dailyRewardTimeLeft, setDailyRewardTimeLeft] = useState("");
@@ -70,6 +70,7 @@ function App() {
       setDailyCipherTimeLeft(calculateTimeLeft(19));
       setDailyComboTimeLeft(calculateTimeLeft(12));
     };
+
     updateCountdowns();
     const interval = setInterval(updateCountdowns, 60000); // Update every minute
 
@@ -90,6 +91,7 @@ function App() {
     setClicks([...clicks, { id: Date.now(), x: e.pageX, y: e.pageY }]);
   };
 
+  // responsible for the aimation of numbers on clicks
   const handleAnimationEnd = (id: number) => {
     setClicks((prevClicks) => prevClicks.filter(click => click.id !== id));
   };
@@ -100,10 +102,19 @@ function App() {
     }
     const currentLevelMin = levelMinPoints[levelIndex];
     const nextLevelMin = levelMinPoints[levelIndex + 1];
-    const progress =
-      ((points - currentLevelMin) / (nextLevelMin - currentLevelMin)) * 100;
+    const progress = ((points - currentLevelMin) / (nextLevelMin - currentLevelMin)) * 100;
     return Math.min(progress, 100);
   };
+
+  useEffect(() => {
+    const currentLevelMin = levelMinPoints[levelIndex];
+    const nextLevelMin = levelMinPoints[levelIndex + 1];
+    if (points >= nextLevelMin && levelIndex < levelNames.length - 1) {
+      setLevelIndex(levelIndex + 1);
+    } else if (points < currentLevelMin && levelIndex > 0) {
+      setLevelIndex(levelIndex - 1);
+    }
+  }, [points, levelIndex, levelMinPoints, levelNames.length]);
 
   const formatProfitPerHour = (profit: number) => {
     if (profit >= 1000000000) return `+${(profit / 1000000000).toFixed(2)}B`;
