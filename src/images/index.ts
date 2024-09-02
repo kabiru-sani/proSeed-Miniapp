@@ -8,6 +8,7 @@ import mainCharacter from "./main-character.png";
 import hamsterCoin from "./hamster-coin.png";
 import proseedC from "./proseedC.png";
 import proseedLogo from "./proseed-logo.png";
+import proseedCoin from "./ps-coin.png";
 
 export {
     hamsterExchange,
@@ -19,5 +20,6 @@ export {
     mainCharacter,
     hamsterCoin,
     proseedC,
-    proseedLogo
+    proseedLogo,
+    proseedCoin
 };

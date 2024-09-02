@@ -4,6 +4,9 @@ import Hamster from "./icons/Hamster";
 import * as images from "./images";
 import Info from "./icons/Info";
 import Settings from "./icons/Settings";
+import Mine from "./icons/Mine";
+import Friends from "./icons/Friends";
+import Coins from "./icons/Coins";
 
 function App() {
   const levelNames = [
@@ -35,7 +38,7 @@ function App() {
   const [levelIndex, setLevelIndex] = useState(6);
   const [points, setPoints] = useState(22749365);
   const [clicks, setClicks] = useState<{ id: number, x: number, y: number }[]>([]);
-  const pointsToAdd = 11;
+  const pointsToAdd = 10;
   const profitPerHour = 126420;
 
   const [dailyRewardTimeLeft, setDailyRewardTimeLeft] = useState("");
@@ -67,7 +70,6 @@ function App() {
       setDailyCipherTimeLeft(calculateTimeLeft(19));
       setDailyComboTimeLeft(calculateTimeLeft(12));
     };
-
     updateCountdowns();
     const interval = setInterval(updateCountdowns, 60000); // Update every minute
 
@@ -88,6 +90,10 @@ function App() {
     setClicks([...clicks, { id: Date.now(), x: e.pageX, y: e.pageY }]);
   };
 
+  const handleAnimationEnd = (id: number) => {
+    setClicks((prevClicks) => prevClicks.filter(click => click.id !== id));
+  };
+
   const calculateProgress = () => {
     if (levelIndex >= levelNames.length - 1) {
       return 100;
@@ -105,6 +111,14 @@ function App() {
     if (profit >= 1000) return `+${(profit / 1000).toFixed(2)}K`;
     return `+${profit}`;
   };
+
+  useEffect(() => {
+    const pointsPerSecond = Math.floor(profitPerHour / 3600);
+    const interval = setInterval(() => {
+      setPoints(prevPoints => prevPoints + pointsPerSecond);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [profitPerHour]);
 
   return (
     <div className="bg-black flex justify-center">
@@ -165,26 +179,26 @@ function App() {
               <div className="bg-[#272a2f] rounded-lg px-4 py-2 w-full relative">
                 <div className="dot"></div>
                 <img src={images.dailyReward} alt="Daily Reward" className="mx-auto w-12 h-12" />
-                <p className="text-[10px] text-center text-white mt-1">Daily reward</p>
+                <p className="text-[10px] text-center text-white mt-1">Daily checkin</p>
                 <p className="text-[10px] font-medium text-center text-gray-400 mt-2">{dailyRewardTimeLeft}</p>
               </div>
               <div className="bg-[#272a2f] rounded-lg px-4 py-2 w-full relative">
                 <div className="dot"></div>
                 <img src={images.dailyCipher} alt="Daily Cipher" className="mx-auto w-12 h-12" />
-                <p className="text-[10px] text-center text-white mt-1">Daily cipher</p>
+                <p className="text-[10px] text-center text-white mt-1">Daily activity</p>
                 <p className="text-[10px] font-medium text-center text-gray-400 mt-2">{dailyCipherTimeLeft}</p>
               </div>
               <div className="bg-[#272a2f] rounded-lg px-4 py-2 w-full relative">
                 <div className="dot"></div>
                 <img src={images.dailyCombo} alt="Daily Combo" className="mx-auto w-12 h-12" />
-                <p className="text-[10px] text-center text-white mt-1">Daily combo</p>
+                <p className="text-[10px] text-center text-white mt-1">Daily task</p>
                 <p className="text-[10px] font-medium text-center text-gray-400 mt-2">{dailyComboTimeLeft}</p>
               </div>
             </div>
 
             <div className="px-4 mt-4 flex justify-center">
               <div className="px-4 py-2 flex items-center space-x-2">
-                <img src={images.dollarCoin} alt="Dollar Coin" className="w-10 h-10" />
+                <img src={images.proseedC} alt="Dollar Coin" className="w-10 h-10" />
                 <p className="text-4xl text-white">{points.toLocaleString()}</p>
               </div>
             </div>
@@ -201,8 +215,47 @@ function App() {
             </div>
           </div>
         </div>
-        
       </div>
+
+      {/* Bottom fixed div */}
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-[calc(100%-2rem)] max-w-xl bg-[#272a2f] flex justify-around items-center z-50 rounded-3xl text-xs">
+        <div className="text-center text-[#85827d] w-1/5 bg-[#1c1f24] m-1 p-2 rounded-2xl">
+          <img src={images.binanceLogo} alt="Exchange" className="w-8 h-8 mx-auto" />
+          <p className="mt-1">Exchange</p>
+        </div>
+        <div className="text-center text-[#85827d] w-1/5">
+          <Mine className="w-8 h-8 mx-auto" />
+          <p className="mt-1">Mine</p>
+        </div>
+        <div className="text-center text-[#85827d] w-1/5">
+          <Friends className="w-8 h-8 mx-auto" />
+          <p className="mt-1">Friends</p>
+        </div>
+        <div className="text-center text-[#85827d] w-1/5">
+          <Coins className="w-8 h-8 mx-auto" />
+          <p className="mt-1">Earn</p>
+        </div>
+        <div className="text-center text-[#85827d] w-1/5">
+          <img src={images.proseedCoin} alt="Airdrop" className="w-10 h-10 mx-auto" />
+          <p className="mt-1">Airdrop</p>
+        </div>
+      </div>
+
+      {clicks.map((click) => (
+        <div
+          key={click.id}
+          className="absolute text-5xl font-bold opacity-0 text-white pointer-events-none"
+          style={{
+            top: `${click.y - 42}px`,
+            left: `${click.x - 28}px`,
+            animation: `float 1s ease-out`
+          }}
+          onAnimationEnd={() => handleAnimationEnd(click.id)}
+        >
+          {pointsToAdd}
+        </div>
+      ))}
+      
     </div>
   );
 }
